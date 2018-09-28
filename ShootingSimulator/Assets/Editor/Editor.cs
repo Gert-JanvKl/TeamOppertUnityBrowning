@@ -1,4 +1,4 @@
-class MyEditorScript {
+class Editor {
         static string[] SCENES = FindEnabledEditorScenes();
  
         static string APP_NAME = "YourProject";
