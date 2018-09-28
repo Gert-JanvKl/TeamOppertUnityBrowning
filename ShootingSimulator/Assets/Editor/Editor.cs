@@ -1,26 +1,32 @@
-using UnityEditor;
-using UnityEngine;
-using UnityEditor.Build.Reporting;
-// Output the build size or a failure depending on BuildPlayer.
-public class BuildPlayerExample : MonoBehaviour
-{
-    [MenuItem("Build/Build iOS")]
-    public static void MyBuild()
-    {
-        BuildPlayerOptions buildPlayerOptions = new BuildPlayerOptions();
-        buildPlayerOptions.scenes = new[] { "Assets/SampleScene.unity"};
-        buildPlayerOptions.locationPathName = "/Build";
-        buildPlayerOptions.target = BuildTarget.StandaloneWindows64;
-        buildPlayerOptions.options = BuildOptions.None;
-        BuildReport report = BuildPipeline.BuildPlayer(buildPlayerOptions);
-        BuildSummary summary = report.summary;
-        if (summary.result == BuildResult.Succeeded)
-        {
-            Debug.Log("Build succeeded: " + summary.totalSize + " bytes");
+class MyEditorScript {
+        static string[] SCENES = FindEnabledEditorScenes();
+ 
+        static string APP_NAME = "YourProject";
+        static string TARGET_DIR = "target";
+ 
+        [MenuItem ("Custom/CI/Build Windows 64-bit")]
+	static void PerformWinBuild (){
+		SetupNameAndDir();
+		string target_dir = APP_NAME + ".exe";
+		GenericBuild(SCENES, TARGET_DIR + "/win/" + target_dir, BuildTarget.StandaloneWindows64,BuildOptions.None);
+	}
+
+ 
+    private static string[] FindEnabledEditorScenes() {
+        List<string> EditorScenes = new List<string>();
+        foreach(EditorBuildSettingsScene scene in EditorBuildSettings.scenes) {
+            if (!scene.enabled) continue;
+            EditorScenes.Add(scene.path);
         }
-        if (summary.result == BuildResult.Failed)
-        {
-            Debug.Log("Build failed");
-        }
+        return EditorScenes.ToArray();
     }
+ 
+        static void GenericBuild(string[] scenes, string target_dir, BuildTarget build_target, BuildOptions build_options)
+        {
+                EditorUserBuildSettings.SwitchActiveBuildTarget(build_target);
+                string res = BuildPipeline.BuildPlayer(scenes,target_dir,build_target,build_options);
+                if (res.Length > 0) {
+                        throw new Exception("BuildPlayer failure: " + res);
+                }
+        }
 }
