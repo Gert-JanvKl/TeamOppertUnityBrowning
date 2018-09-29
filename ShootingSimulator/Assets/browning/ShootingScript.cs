@@ -7,7 +7,7 @@ public class ExampleClass : MonoBehaviour
 	{
 		if (Input.GetKeyDown("e"))
 		{
-			print("space key was pressed");
+			print("e key was pressed");
 		}
 	}
 }
